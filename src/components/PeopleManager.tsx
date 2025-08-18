@@ -1,11 +1,8 @@
 import React, { useState } from "react";
-import { Person } from "../types";
+//types
+import { Person, PeopleManagerProps } from "../types";
+//ui
 import { FaUserPlus } from "react-icons/fa";
-
-interface PeopleManagerProps {
-  people: Person[];
-  onAddPerson: (person: Person) => void;
-}
 
 export default function PeopleManager({
   people,
@@ -31,17 +28,17 @@ export default function PeopleManager({
       <h2 className="text-xl font-semibold mb-4">Personas</h2>
 
       <form onSubmit={handleSubmit} className="mb-4">
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-col md:flex-row">
           <input
             type="text"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             placeholder="Nombre"
-            className="flex-1 pl-2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="flex-1 p-2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           />
           <button
             type="submit"
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             <FaUserPlus className="w-5 h-5 mr-2" />
             Agregar

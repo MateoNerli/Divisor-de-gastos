@@ -1,15 +1,12 @@
-interface PaidBySelectorProps {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  people: { id: string; name: string }[];
-}
+//types
+import { PaidBySelectorProps } from "../types";
 
 function PaidBySelector({
   label,
   value,
   onChange,
   people,
+  ...props
 }: PaidBySelectorProps) {
   return (
     <div>
@@ -17,6 +14,7 @@ function PaidBySelector({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        {...props}
         className="py-2 pl-2 pr-4 border mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
       >
         <option value="">Persona que pago</option>

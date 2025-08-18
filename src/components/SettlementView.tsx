@@ -1,11 +1,8 @@
 import { useEffect, useState } from "react";
+//ui
 import { FaArrowRight } from "react-icons/fa";
-import { Settlement, Person, Expense } from "../types";
-
-interface SettlementViewProps {
-  people: Person[];
-  expenses: Expense[];
-}
+//types
+import { Settlement, Person, Expense, SettlementViewProps } from "../types";
 
 export default function SettlementView({
   people,

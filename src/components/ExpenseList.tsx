@@ -1,12 +1,13 @@
-import { FaReceipt } from "react-icons/fa";
-import { Expense, Person } from "../types";
+//ui
+import { FaReceipt, FaEdit } from "react-icons/fa";
+//types
+import { Expense, Person, ExpenseListProps } from "../types";
 
-interface ExpenseListProps {
-  expenses: Expense[];
-  people: Person[];
-}
-
-export default function ExpenseList({ expenses, people }: ExpenseListProps) {
+export default function ExpenseList({
+  expenses,
+  people,
+  onEdit,
+}: ExpenseListProps) {
   return (
     <div className="bg-white rounded-lg shadow-md">
       <div className="p-4 border-b border-gray-200">
@@ -38,7 +39,15 @@ export default function ExpenseList({ expenses, people }: ExpenseListProps) {
                   </p>
                 </div>
               </div>
-              <p className="font-semibold">${expense.amount}</p>
+              <div className="flex items-center space-x-4">
+                <p className="font-semibold">${expense.amount}</p> {" "}
+                <button
+                  onClick={() => onEdit(expense)}
+                  className="text-blue-500 hover:text-blue-700"
+                >
+                  <FaEdit />
+                </button>
+              </div>
             </div>
           ))
         )}
