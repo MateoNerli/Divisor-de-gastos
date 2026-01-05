@@ -207,6 +207,15 @@ function App() {
             Limpiar Todo
           </button>
           <button
+            onClick={() => {
+              setExpenses([]);
+              localStorage.removeItem("expenses");
+            }}
+            className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+          >
+            Limpiar Gastos
+          </button>
+          <button
             onClick={handleExportData}
             className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
           >
