@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
 enum GroupRole {
@@ -19,20 +20,20 @@ enum ExpenseSplitType {
 }
 
 model User {
-  id              String             @id @default(cuid())
-  email           String             @unique
-  passwordHash    String
-  name            String?
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
-  deletedAt       DateTime?
-  memberships     Membership[]
-  createdGroups   Group[]            @relation("GroupCreator")
+  id                String             @id @default(cuid())
+  email             String             @unique
+  passwordHash      String
+  name              String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  deletedAt         DateTime?
+  memberships       Membership[]
+  createdGroups     Group[]            @relation("GroupCreator")
   eventParticipants EventParticipant[]
-  expensesPaid    Expense[]          @relation("ExpensePayer")
-  expenseShares   ExpenseShare[]
-  categories      Category[]         @relation("CategoryCreator")
-  invites         Invite[]           @relation("InviteCreator")
+  expensesPaid      Expense[]          @relation("ExpensePayer")
+  expenseShares     ExpenseShare[]
+  categories        Category[]         @relation("CategoryCreator")
+  invites           Invite[]           @relation("InviteCreator")
 }
 
 model Group {
@@ -69,34 +70,34 @@ model Membership {
 }
 
 model Invite {
-  id           String   @id @default(cuid())
-  token        String   @unique
+  id           String    @id @default(cuid())
+  token        String    @unique
   groupId      String
   invitedById  String
   invitedEmail String?
   expiresAt    DateTime
   usedAt       DateTime?
-  createdAt    DateTime @default(now())
-  group        Group    @relation(fields: [groupId], references: [id])
-  invitedBy    User     @relation("InviteCreator", fields: [invitedById], references: [id])
+  createdAt    DateTime  @default(now())
+  group        Group     @relation(fields: [groupId], references: [id])
+  invitedBy    User      @relation("InviteCreator", fields: [invitedById], references: [id])
 
   @@index([groupId])
   @@index([invitedEmail])
 }
 
 model Event {
-  id          String             @id @default(cuid())
-  groupId     String
-  name        String
-  description String?
-  startsAt    DateTime?
-  endsAt      DateTime?
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
-  deletedAt   DateTime?
-  group       Group              @relation(fields: [groupId], references: [id])
+  id           String             @id @default(cuid())
+  groupId      String
+  name         String
+  description  String?
+  startsAt     DateTime?
+  endsAt       DateTime?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  deletedAt    DateTime?
+  group        Group              @relation(fields: [groupId], references: [id])
   participants EventParticipant[]
-  expenses    Expense[]
+  expenses     Expense[]
 
   @@index([groupId])
   @@index([deletedAt])
