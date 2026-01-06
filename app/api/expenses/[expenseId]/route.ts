@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -12,13 +14,15 @@ const expenseUpdateSchema = z.object({
   categoryId: z.string().optional(),
   splitType: z.enum(["EQUAL", "EXACT", "PERCENT"]),
   expenseDate: z.string().datetime().optional(),
-  shares: z.array(
-    z.object({
-      userId: z.string().min(1),
-      amount: z.number().optional(),
-      percent: z.number().optional(),
-    })
-  ).min(1),
+  shares: z
+    .array(
+      z.object({
+        userId: z.string().min(1),
+        amount: z.number().optional(),
+        percent: z.number().optional(),
+      })
+    )
+    .min(1),
 });
 
 const round = (value: number) => Math.round(value * 100) / 100;
@@ -50,7 +54,10 @@ export async function GET(
     );
   }
 
-  const access = await requireGroupMembership(auth.userId!, expense.event.groupId);
+  const access = await requireGroupMembership(
+    auth.userId!,
+    expense.event.groupId
+  );
   if (access.response || !access.membership) {
     return access.response!;
   }
@@ -94,7 +101,10 @@ export async function PATCH(
     );
   }
 
-  const access = await requireGroupMembership(auth.userId!, existing.event.groupId);
+  const access = await requireGroupMembership(
+    auth.userId!,
+    existing.event.groupId
+  );
   if (access.response || !access.membership) {
     return access.response!;
   }
@@ -109,10 +119,7 @@ export async function PATCH(
   const payload = await request.json().catch(() => null);
   const parsed = expenseUpdateSchema.safeParse(payload);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Datos invalidos." },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Datos invalidos." }, { status: 400 });
   }
 
   const participantRows = await prisma.eventParticipant.findMany({
@@ -271,7 +278,10 @@ export async function DELETE(
     );
   }
 
-  const access = await requireGroupMembership(auth.userId!, existing.event.groupId);
+  const access = await requireGroupMembership(
+    auth.userId!,
+    existing.event.groupId
+  );
   if (access.response || !access.membership) {
     return access.response!;
   }
@@ -290,6 +300,3 @@ export async function DELETE(
 
   return NextResponse.json({ ok: true });
 }
-
-
-

@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -81,10 +83,7 @@ export async function PATCH(
   const payload = await request.json().catch(() => null);
   const parsed = eventUpdateSchema.safeParse(payload);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Datos invalidos." },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Datos invalidos." }, { status: 400 });
   }
 
   const event = await prisma.event.update({
@@ -92,7 +91,9 @@ export async function PATCH(
     data: {
       name: parsed.data.name ?? undefined,
       description:
-        parsed.data.description === undefined ? undefined : parsed.data.description,
+        parsed.data.description === undefined
+          ? undefined
+          : parsed.data.description,
     },
   });
 
@@ -135,5 +136,3 @@ export async function DELETE(
 
   return NextResponse.json({ ok: true });
 }
-
-
