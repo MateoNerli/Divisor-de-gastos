@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
@@ -55,6 +57,3 @@ export async function POST(request: Request) {
   await setAuthCookie(response, user.id);
   return response;
 }
-
-
-
