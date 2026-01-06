@@ -1,0 +1,169 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum GroupRole {
+  ADMIN
+  MEMBER
+}
+
+enum ExpenseSplitType {
+  EQUAL
+  EXACT
+  PERCENT
+}
+
+model User {
+  id              String             @id @default(cuid())
+  email           String             @unique
+  passwordHash    String
+  name            String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  deletedAt       DateTime?
+  memberships     Membership[]
+  createdGroups   Group[]            @relation("GroupCreator")
+  eventParticipants EventParticipant[]
+  expensesPaid    Expense[]          @relation("ExpensePayer")
+  expenseShares   ExpenseShare[]
+  categories      Category[]         @relation("CategoryCreator")
+  invites         Invite[]           @relation("InviteCreator")
+}
+
+model Group {
+  id          String       @id @default(cuid())
+  name        String
+  createdById String
+  createdBy   User         @relation("GroupCreator", fields: [createdById], references: [id])
+  memberships Membership[]
+  events      Event[]
+  categories  Category[]
+  invites     Invite[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedAt   DateTime?
+
+  @@index([createdById])
+  @@index([deletedAt])
+}
+
+model Membership {
+  id        String    @id @default(cuid())
+  userId    String
+  groupId   String
+  role      GroupRole @default(MEMBER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  user      User      @relation(fields: [userId], references: [id])
+  group     Group     @relation(fields: [groupId], references: [id])
+
+  @@unique([userId, groupId])
+  @@index([groupId, role])
+  @@index([deletedAt])
+}
+
+model Invite {
+  id           String   @id @default(cuid())
+  token        String   @unique
+  groupId      String
+  invitedById  String
+  invitedEmail String?
+  expiresAt    DateTime
+  usedAt       DateTime?
+  createdAt    DateTime @default(now())
+  group        Group    @relation(fields: [groupId], references: [id])
+  invitedBy    User     @relation("InviteCreator", fields: [invitedById], references: [id])
+
+  @@index([groupId])
+  @@index([invitedEmail])
+}
+
+model Event {
+  id          String             @id @default(cuid())
+  groupId     String
+  name        String
+  description String?
+  startsAt    DateTime?
+  endsAt      DateTime?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  deletedAt   DateTime?
+  group       Group              @relation(fields: [groupId], references: [id])
+  participants EventParticipant[]
+  expenses    Expense[]
+
+  @@index([groupId])
+  @@index([deletedAt])
+}
+
+model EventParticipant {
+  id        String   @id @default(cuid())
+  eventId   String
+  userId    String
+  createdAt DateTime @default(now())
+  event     Event    @relation(fields: [eventId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([eventId, userId])
+  @@index([userId])
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  groupId     String
+  createdById String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  group       Group     @relation(fields: [groupId], references: [id])
+  createdBy   User?     @relation("CategoryCreator", fields: [createdById], references: [id])
+  expenses    Expense[]
+
+  @@unique([groupId, name])
+  @@index([groupId])
+  @@index([deletedAt])
+}
+
+model Expense {
+  id          String           @id @default(cuid())
+  eventId     String
+  paidById    String
+  categoryId  String?
+  description String
+  amount      Decimal
+  currency    String           @default("ARS")
+  splitType   ExpenseSplitType @default(EQUAL)
+  expenseDate DateTime         @default(now())
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  deletedAt   DateTime?
+  event       Event            @relation(fields: [eventId], references: [id])
+  paidBy      User             @relation("ExpensePayer", fields: [paidById], references: [id])
+  category    Category?        @relation(fields: [categoryId], references: [id])
+  shares      ExpenseShare[]
+
+  @@index([eventId])
+  @@index([paidById])
+  @@index([deletedAt])
+}
+
+model ExpenseShare {
+  id        String   @id @default(cuid())
+  expenseId String
+  userId    String
+  amount    Decimal
+  percent   Decimal?
+  createdAt DateTime @default(now())
+  expense   Expense  @relation(fields: [expenseId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([expenseId, userId])
+  @@index([userId])
+}

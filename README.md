@@ -1,14 +1,22 @@
-# Divisor de Gastos Web
-Una aplicación web sencilla y eficiente para dividir gastos entre varias personas. Permite agregar personas, registrar gastos y calcular automáticamente cuánto debe pagar o recibir cada persona.
+# Divisor de gastos
+App web para dividir gastos con grupos, eventos y balances.
 
-## Características
-1. Agregar personas: Crea un listado de participantes en el gasto.
-2. Registrar gastos: Añade gastos indicando monto, descripción y quién lo pagó.
-3. División automática: Calcula cuánto le corresponde pagar o recibir a cada persona.
-4. Resumen claro: Visualiza un resumen de los gastos y deudas de cada participante.
-5. Interfaz amigable: Fácil de usar y de entender.
+Stack: Next.js (App Router), Prisma y Postgres (Vercel Postgres).
 
-## Tecnologías
-1. Frontend: Vite React JS.
-2. Almacenamiento: LocalStorage , JSON.
+## Funcionalidades
+- Registro/login con email y password
+- Grupos, miembros e invitaciones por link
+- Eventos con participantes
+- Gastos con categorias, monedas y splits (igual, monto exacto, porcentaje)
+- Balances por evento y resumen por categoria
 
+## Setup
+1. Copia `.env.example` a `.env` y completa `DATABASE_URL` y `AUTH_SECRET`.
+2. `npm install`
+3. `npm run db:migrate`
+4. `npm run dev`
+
+## Scripts
+- `npm run dev`: entorno local
+- `npm run db:migrate`: migraciones Prisma
+- `npm run db:generate`: genera Prisma Client
