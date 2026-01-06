@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -21,7 +23,10 @@ export async function GET(request: NextRequest) {
   });
 
   if (!user) {
-    return NextResponse.json({ error: "Usuario no encontrado." }, { status: 404 });
+    return NextResponse.json(
+      { error: "Usuario no encontrado." },
+      { status: 404 }
+    );
   }
 
   return NextResponse.json(user);
@@ -36,10 +41,7 @@ export async function PATCH(request: NextRequest) {
   const payload = await request.json().catch(() => null);
   const parsed = profileSchema.safeParse(payload);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Datos invalidos." },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Datos invalidos." }, { status: 400 });
   }
 
   if (!parsed.data.name && !parsed.data.email) {
@@ -94,6 +96,3 @@ export async function DELETE(request: NextRequest) {
   clearAuthCookie(response);
   return response;
 }
-
-
-

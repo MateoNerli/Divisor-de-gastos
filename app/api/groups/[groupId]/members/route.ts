@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -60,10 +62,7 @@ export async function POST(
   const payload = await request.json().catch(() => null);
   const parsed = memberSchema.safeParse(payload);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Datos invalidos." },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Datos invalidos." }, { status: 400 });
   }
 
   const email = parsed.data.email.toLowerCase();
@@ -100,6 +99,3 @@ export async function POST(
     role: membership.role,
   });
 }
-
-
-

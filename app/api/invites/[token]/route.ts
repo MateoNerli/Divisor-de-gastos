@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 
@@ -31,5 +33,3 @@ export async function GET(
     expiresAt: invite.expiresAt,
   });
 }
-
-
