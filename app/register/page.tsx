@@ -90,6 +90,13 @@ export default function RegisterPage() {
             Ingresa
           </Link>
         </p>
+        <p className="mt-2 text-sm text-gray-600">
+          O usa la{" "}
+          <Link className="text-blue-600 hover:underline" href="/quick">
+            division rapida
+          </Link>{" "}
+          sin login.
+        </p>
       </div>
     </div>
   );
