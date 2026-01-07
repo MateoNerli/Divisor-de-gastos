@@ -45,7 +45,13 @@ type BalanceSummary = {
     owed: number;
     net: number;
   }[];
-  settlements: { fromId: string; fromName: string; toId: string; toName: string; amount: number }[];
+  settlements: {
+    fromId: string;
+    fromName: string;
+    toId: string;
+    toName: string;
+    amount: number;
+  }[];
   byCategory: { category: string; total: number }[];
 };
 
@@ -81,11 +87,15 @@ export default function EventPage() {
     []
   );
   const [shareAmounts, setShareAmounts] = useState<Record<string, string>>({});
-  const [sharePercents, setSharePercents] = useState<Record<string, string>>({});
+  const [sharePercents, setSharePercents] = useState<Record<string, string>>(
+    {}
+  );
 
   const participantMap = useMemo(() => {
     const map = new Map<string, Participant>();
-    event?.participants.forEach((participant) => map.set(participant.id, participant));
+    event?.participants.forEach((participant) =>
+      map.set(participant.id, participant)
+    );
     return map;
   }, [event]);
 
@@ -98,7 +108,10 @@ export default function EventPage() {
     const eventData = (await eventResponse.json()) as EventDetail;
     setEvent(eventData);
 
-    if (selectedParticipants.length === 0 && eventData.participants.length > 0) {
+    if (
+      selectedParticipants.length === 0 &&
+      eventData.participants.length > 0
+    ) {
       setSelectedParticipants(eventData.participants.map((p) => p.id));
       setPaidById(eventData.participants[0]?.id || "");
     }
@@ -138,10 +151,7 @@ export default function EventPage() {
   }, [eventId]);
 
   useEffect(() => {
-    localStorage.setItem(
-      `event_paid_${eventId}`,
-      JSON.stringify(paidStatus)
-    );
+    localStorage.setItem(`event_paid_${eventId}`, JSON.stringify(paidStatus));
   }, [eventId, paidStatus]);
 
   const toggleParticipant = (participantId: string) => {
@@ -153,12 +163,15 @@ export default function EventPage() {
     });
   };
 
-  const handleCreateExpense = async (
-    eventForm: FormEvent<HTMLFormElement>
-  ) => {
+  const handleCreateExpense = async (eventForm: FormEvent<HTMLFormElement>) => {
     eventForm.preventDefault();
     setError("");
-    if (!description.trim() || !amount || !paidById || selectedParticipants.length === 0) {
+    if (
+      !description.trim() ||
+      !amount ||
+      !paidById ||
+      selectedParticipants.length === 0
+    ) {
       setError("Completa descripcion, monto, pagador y participantes.");
       return;
     }
@@ -166,9 +179,7 @@ export default function EventPage() {
     const sharePayload = selectedParticipants.map((userId) => ({
       userId,
       amount:
-        splitType === "EXACT"
-          ? Number(shareAmounts[userId] || 0)
-          : undefined,
+        splitType === "EXACT" ? Number(shareAmounts[userId] || 0) : undefined,
       percent:
         splitType === "PERCENT"
           ? Number(sharePercents[userId] || 0)
@@ -243,9 +254,11 @@ export default function EventPage() {
       const key = `${settlement.fromId}-${settlement.toId}`;
       const paid = paidStatus[key] || false;
       const paidSuffix = paid ? " (pago)" : "";
-      return `- ${settlement.fromName} debe ${settlement.amount.toFixed(2)} a ${settlement.toName}${paidSuffix}`;
+      return `- ${settlement.fromName} debe ${settlement.amount.toFixed(2)} a ${
+        settlement.toName
+      }${paidSuffix}`;
     });
-    return `Balance del evento "${event.name}":\n${lines.join("\n")}`;
+    return `Balance del evento "${event?.name}":\n${lines.join("\n")}`;
   };
 
   if (!event) {
@@ -281,33 +294,43 @@ export default function EventPage() {
                   <input
                     type="text"
                     value={description}
-                    onChange={(eventInput) => setDescription(eventInput.target.value)}
+                    onChange={(eventInput) =>
+                      setDescription(eventInput.target.value)
+                    }
                     className="rounded border border-gray-300 px-3 py-2"
                     placeholder="Descripcion"
                   />
                   <input
                     type="number"
                     value={amount}
-                    onChange={(eventInput) => setAmount(eventInput.target.value)}
+                    onChange={(eventInput) =>
+                      setAmount(eventInput.target.value)
+                    }
                     className="rounded border border-gray-300 px-3 py-2"
                     placeholder="Monto"
                   />
                   <input
                     type="text"
                     value={currency}
-                    onChange={(eventInput) => setCurrency(eventInput.target.value.toUpperCase())}
+                    onChange={(eventInput) =>
+                      setCurrency(eventInput.target.value.toUpperCase())
+                    }
                     className="rounded border border-gray-300 px-3 py-2"
                     placeholder="ARS"
                   />
                   <input
                     type="date"
                     value={expenseDate}
-                    onChange={(eventInput) => setExpenseDate(eventInput.target.value)}
+                    onChange={(eventInput) =>
+                      setExpenseDate(eventInput.target.value)
+                    }
                     className="rounded border border-gray-300 px-3 py-2"
                   />
                   <select
                     value={paidById}
-                    onChange={(eventInput) => setPaidById(eventInput.target.value)}
+                    onChange={(eventInput) =>
+                      setPaidById(eventInput.target.value)
+                    }
                     className="rounded border border-gray-300 px-3 py-2"
                   >
                     <option value="">Pagado por</option>
@@ -319,7 +342,9 @@ export default function EventPage() {
                   </select>
                   <select
                     value={categoryId}
-                    onChange={(eventInput) => setCategoryId(eventInput.target.value)}
+                    onChange={(eventInput) =>
+                      setCategoryId(eventInput.target.value)
+                    }
                     className="rounded border border-gray-300 px-3 py-2"
                   >
                     <option value="">Categoria</option>
@@ -352,7 +377,9 @@ export default function EventPage() {
                       >
                         <input
                           type="checkbox"
-                          checked={selectedParticipants.includes(participant.id)}
+                          checked={selectedParticipants.includes(
+                            participant.id
+                          )}
                           onChange={() => toggleParticipant(participant.id)}
                         />
                         <span>{participant.name || participant.email}</span>
@@ -417,7 +444,8 @@ export default function EventPage() {
                         <div>
                           <p className="font-medium">{expense.description}</p>
                           <p className="text-xs text-gray-500">
-                            Pagado por {expense.paidBy.name || expense.paidBy.email} \u00b7{" "}
+                            Pagado por{" "}
+                            {expense.paidBy.name || expense.paidBy.email} \u00b7{" "}
                             {new Date(expense.createdAt).toLocaleDateString()}
                           </p>
                           <p className="text-xs text-gray-500">
@@ -444,7 +472,9 @@ export default function EventPage() {
                             <div key={share.userId}>
                               {participant?.name || participant?.email}:{" "}
                               {expense.currency} {share.amount.toFixed(2)}
-                              {share.percent !== null ? ` (${share.percent}%)` : ""}
+                              {share.percent !== null
+                                ? ` (${share.percent}%)`
+                                : ""}
                             </div>
                           );
                         })}
@@ -463,7 +493,9 @@ export default function EventPage() {
                 <button
                   type="button"
                   disabled={!balances || balances.settlements.length === 0}
-                  onClick={() => handleCopy(buildBalanceMessage(), "balance-all")}
+                  onClick={() =>
+                    handleCopy(buildBalanceMessage(), "balance-all")
+                  }
                   className="rounded border border-gray-300 px-2 py-1 text-xs text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                 >
                   {copiedKey === "balance-all" ? "Copiado" : "Copiar balance"}
@@ -472,7 +504,9 @@ export default function EventPage() {
               {!balances ? (
                 <p className="text-sm text-gray-500">Calculando...</p>
               ) : balances.settlements.length === 0 ? (
-                <p className="text-sm text-gray-500">No hay deudas pendientes.</p>
+                <p className="text-sm text-gray-500">
+                  No hay deudas pendientes.
+                </p>
               ) : (
                 <div className="space-y-3 text-sm">
                   {balances.settlements.map((settlement) => {
@@ -487,7 +521,9 @@ export default function EventPage() {
                         className="rounded border border-gray-200 px-3 py-2"
                       >
                         <div className="flex items-start justify-between gap-3">
-                          <div className={paid ? "opacity-60 line-through" : ""}>
+                          <div
+                            className={paid ? "opacity-60 line-through" : ""}
+                          >
                             <div className="font-medium">
                               {settlement.fromName}
                             </div>
@@ -521,13 +557,18 @@ export default function EventPage() {
             </div>
 
             <div className="rounded-lg bg-white p-6 shadow">
-              <h2 className="text-xl font-semibold mb-4">Resumen por persona</h2>
+              <h2 className="text-xl font-semibold mb-4">
+                Resumen por persona
+              </h2>
               {!balances ? (
                 <p className="text-sm text-gray-500">Calculando...</p>
               ) : (
                 <div className="space-y-2 text-sm">
                   {balances.totals.map((total) => (
-                    <div key={total.userId} className="flex items-center justify-between">
+                    <div
+                      key={total.userId}
+                      className="flex items-center justify-between"
+                    >
                       <span>{total.name}</span>
                       <span>{total.net.toFixed(2)}</span>
                     </div>
@@ -545,7 +586,10 @@ export default function EventPage() {
               ) : (
                 <div className="space-y-2 text-sm">
                   {balances.byCategory.map((item) => (
-                    <div key={item.category} className="flex items-center justify-between">
+                    <div
+                      key={item.category}
+                      className="flex items-center justify-between"
+                    >
                       <span>{item.category}</span>
                       <span>{item.total.toFixed(2)}</span>
                     </div>
@@ -559,6 +603,3 @@ export default function EventPage() {
     </div>
   );
 }
-
-
-
