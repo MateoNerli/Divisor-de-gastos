@@ -114,7 +114,10 @@ export default function DashboardPage() {
               {error}
             </p>
           )}
-          <form className="flex flex-col gap-3 sm:flex-row" onSubmit={handleCreateGroup}>
+          <form
+            className="flex flex-col gap-3 sm:flex-row"
+            onSubmit={handleCreateGroup}
+          >
             <input
               type="text"
               value={newGroupName}
@@ -150,7 +153,7 @@ export default function DashboardPage() {
                     <div>
                       <p className="font-medium">{group.name}</p>
                       <p className="text-xs text-gray-500">
-                        {group.memberCount} miembros \u00b7 {group.eventCount} eventos
+                        {group.memberCount} miembros {group.eventCount} eventos
                       </p>
                     </div>
                     <span className="text-sm text-blue-600">Ver grupo</span>
@@ -164,5 +167,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-

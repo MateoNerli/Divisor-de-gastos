@@ -212,7 +212,9 @@ export default function GroupPage() {
                 />
                 <textarea
                   value={newEventDescription}
-                  onChange={(event) => setNewEventDescription(event.target.value)}
+                  onChange={(event) =>
+                    setNewEventDescription(event.target.value)
+                  }
                   className="w-full rounded border border-gray-300 px-3 py-2"
                   placeholder="Descripcion (opcional)"
                   rows={3}
@@ -259,7 +261,8 @@ export default function GroupPage() {
                         <div>
                           <p className="font-medium">{item.name}</p>
                           <p className="text-xs text-gray-500">
-                            {item.participantCount} participantes \u00b7 {item.expenseCount} gastos
+                            {item.participantCount} participantes{" "}
+                            {item.expenseCount} gastos
                           </p>
                         </div>
                         <span className="text-sm text-blue-600">
@@ -274,7 +277,10 @@ export default function GroupPage() {
 
             <div className="rounded-lg bg-white p-6 shadow">
               <h2 className="text-xl font-semibold mb-4">Categorias</h2>
-              <form className="flex flex-col gap-3 sm:flex-row" onSubmit={handleCreateCategory}>
+              <form
+                className="flex flex-col gap-3 sm:flex-row"
+                onSubmit={handleCreateCategory}
+              >
                 <input
                   type="text"
                   value={newCategoryName}
@@ -358,6 +364,3 @@ export default function GroupPage() {
     </div>
   );
 }
-
-
-

@@ -445,11 +445,11 @@ export default function EventPage() {
                           <p className="font-medium">{expense.description}</p>
                           <p className="text-xs text-gray-500">
                             Pagado por{" "}
-                            {expense.paidBy.name || expense.paidBy.email} \u00b7{" "}
+                            {expense.paidBy.name || expense.paidBy.email}{" "}
                             {new Date(expense.createdAt).toLocaleDateString()}
                           </p>
                           <p className="text-xs text-gray-500">
-                            {expense.category?.name || "Sin Categoria"} \u00b7{" "}
+                            {expense.category?.name || "Sin Categoria"}{" "}
                             {expense.splitType}
                           </p>
                         </div>
