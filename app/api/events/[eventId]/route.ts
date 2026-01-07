@@ -47,6 +47,8 @@ export async function GET(
     name: event.name,
     description: event.description,
     groupId: event.groupId,
+    currentUserId: auth.userId,
+    currentUserRole: access.membership.role,
     participants: event.participants.map((participant) => ({
       id: participant.user.id,
       name: participant.user.name,

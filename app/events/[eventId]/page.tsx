@@ -14,6 +14,8 @@ type EventDetail = {
   name: string;
   description: string | null;
   groupId: string;
+  currentUserId: string;
+  currentUserRole: "ADMIN" | "MEMBER";
   participants: Participant[];
 };
 
@@ -61,6 +63,8 @@ export default function EventPage() {
   const [balances, setBalances] = useState<BalanceSummary | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [error, setError] = useState("");
+  const [paidStatus, setPaidStatus] = useState<Record<string, boolean>>({});
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
@@ -123,6 +127,22 @@ export default function EventPage() {
     loadAll();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem(`event_paid_${eventId}`);
+    if (stored) {
+      setPaidStatus(JSON.parse(stored));
+    } else {
+      setPaidStatus({});
+    }
+  }, [eventId]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      `event_paid_${eventId}`,
+      JSON.stringify(paidStatus)
+    );
+  }, [eventId, paidStatus]);
 
   const toggleParticipant = (participantId: string) => {
     setSelectedParticipants((prev) => {
@@ -197,6 +217,22 @@ export default function EventPage() {
       return;
     }
     await loadAll();
+  };
+
+  const handleTogglePaid = (key: string) => {
+    setPaidStatus((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
+  const handleCopy = async (message: string, key: string) => {
+    if (!navigator.clipboard) {
+      return;
+    }
+    await navigator.clipboard.writeText(message);
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey(null), 2000);
   };
 
   if (!event) {
@@ -415,15 +451,58 @@ export default function EventPage() {
               ) : balances.settlements.length === 0 ? (
                 <p className="text-sm text-gray-500">No hay deudas pendientes.</p>
               ) : (
-                <div className="space-y-2 text-sm">
-                  {balances.settlements.map((settlement) => (
-                    <div key={`${settlement.fromId}-${settlement.toId}`} className="flex items-center justify-between">
-                      <span>{settlement.fromName}</span>
-                      <span>
-                        debe {settlement.amount.toFixed(2)} a {settlement.toName}
-                      </span>
-                    </div>
-                  ))}
+                <div className="space-y-3 text-sm">
+                  {balances.settlements.map((settlement) => {
+                    const key = `${settlement.fromId}-${settlement.toId}`;
+                    const canManage =
+                      event.currentUserRole === "ADMIN" ||
+                      event.currentUserId === settlement.toId;
+                    const paid = paidStatus[key] || false;
+                    const message = `Hola ${settlement.fromName}, debes ${settlement.amount.toFixed(
+                      2
+                    )} a ${settlement.toName} por el evento "${event.name}".`;
+                    return (
+                      <div
+                        key={key}
+                        className="rounded border border-gray-200 px-3 py-2"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className={paid ? "opacity-60 line-through" : ""}>
+                            <div className="font-medium">
+                              {settlement.fromName}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              debe {settlement.amount.toFixed(2)} a{" "}
+                              {settlement.toName}
+                            </div>
+                          </div>
+                          <div className="flex flex-col items-end gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleCopy(message, key)}
+                              className="rounded border border-gray-300 px-2 py-1 text-xs text-gray-700 hover:bg-gray-50"
+                            >
+                              {copiedKey === key ? "Copiado" : "Copiar"}
+                            </button>
+                            <label className="flex items-center gap-2 text-xs text-gray-500">
+                              <input
+                                type="checkbox"
+                                checked={paid}
+                                onChange={() => handleTogglePaid(key)}
+                                disabled={!canManage}
+                              />
+                              {paid ? "Pago" : "No pago"}
+                            </label>
+                          </div>
+                        </div>
+                        {!canManage && (
+                          <p className="mt-1 text-xs text-gray-400">
+                            Solo admin o quien pago puede marcar.
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
