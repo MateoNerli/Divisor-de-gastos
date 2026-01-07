@@ -235,6 +235,19 @@ export default function EventPage() {
     setTimeout(() => setCopiedKey(null), 2000);
   };
 
+  const buildBalanceMessage = () => {
+    if (!balances || balances.settlements.length === 0) {
+      return "";
+    }
+    const lines = balances.settlements.map((settlement) => {
+      const key = `${settlement.fromId}-${settlement.toId}`;
+      const paid = paidStatus[key] || false;
+      const paidSuffix = paid ? " (pago)" : "";
+      return `- ${settlement.fromName} debe ${settlement.amount.toFixed(2)} a ${settlement.toName}${paidSuffix}`;
+    });
+    return `Balance del evento "${event.name}":\n${lines.join("\n")}`;
+  };
+
   if (!event) {
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-600">
@@ -445,7 +458,17 @@ export default function EventPage() {
 
           <div className="space-y-6">
             <div className="rounded-lg bg-white p-6 shadow">
-              <h2 className="text-xl font-semibold mb-4">Balances</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold">Balances</h2>
+                <button
+                  type="button"
+                  disabled={!balances || balances.settlements.length === 0}
+                  onClick={() => handleCopy(buildBalanceMessage(), "balance-all")}
+                  className="rounded border border-gray-300 px-2 py-1 text-xs text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  {copiedKey === "balance-all" ? "Copiado" : "Copiar balance"}
+                </button>
+              </div>
               {!balances ? (
                 <p className="text-sm text-gray-500">Calculando...</p>
               ) : balances.settlements.length === 0 ? (
@@ -458,9 +481,6 @@ export default function EventPage() {
                       event.currentUserRole === "ADMIN" ||
                       event.currentUserId === settlement.toId;
                     const paid = paidStatus[key] || false;
-                    const message = `Hola ${settlement.fromName}, debes ${settlement.amount.toFixed(
-                      2
-                    )} a ${settlement.toName} por el evento "${event.name}".`;
                     return (
                       <div
                         key={key}
@@ -477,13 +497,6 @@ export default function EventPage() {
                             </div>
                           </div>
                           <div className="flex flex-col items-end gap-2">
-                            <button
-                              type="button"
-                              onClick={() => handleCopy(message, key)}
-                              className="rounded border border-gray-300 px-2 py-1 text-xs text-gray-700 hover:bg-gray-50"
-                            >
-                              {copiedKey === key ? "Copiado" : "Copiar"}
-                            </button>
                             <label className="flex items-center gap-2 text-xs text-gray-500">
                               <input
                                 type="checkbox"
